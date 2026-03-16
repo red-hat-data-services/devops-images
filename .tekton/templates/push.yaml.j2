@@ -2,34 +2,34 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-runner-images?rev={{revision}}
-    build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-runner-images?rev={{ "{{revision}}" }}
+    build.appstudio.redhat.com/commit_sha: '{{ "{{revision}}" }}'
+    build.appstudio.redhat.com/target_branch: '{{ "{{target_branch}}" }}'
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
         && target_branch == "main"
         && ( 
-          "./openshift-utils/***".pathChanged()
+          "./{{ path_context }}/***".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
-            || ".tekton/devops-openshift-utils-push.yaml".pathChanged()
+            || ".tekton/{{ component_name }}-push.yaml".pathChanged()
         )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: devops-runner-images
-    appstudio.openshift.io/component: devops-openshift-utils
+    appstudio.openshift.io/component: {{ component_name }}
     pipelines.appstudio.openshift.io/type: build
-  name: devops-openshift-utils-on-push
+  name: {{ component_name }}-on-push
   namespace: rhoai-tenant
 spec:
   params:
   - name: git-url
-    value: '{{source_url}}'
+    value: '{{ "{{source_url}}" }}'
   - name: revision
-    value: '{{revision}}'
+    value: '{{ "{{revision}}" }}'
   - name: output-image
-    value: quay.io/rhoai-devops/openshift-utils:{{revision}}
+    value: quay.io/rhoai-devops/{{ image_name }}:{{ "{{revision}}" }}
   - name: additional-tags
     value:
       - latest
@@ -40,9 +40,13 @@ spec:
   - name: dockerfile
     value: Containerfile
   - name: path-context
-    value: openshift-utils
+    value: {{ path_context }}
   - name: build-args-file
     value: ./argfile.conf
+{%- if additional_secret is defined and additional_secret %}
+  - name: additional-secret
+    value: {{ additional_secret }}
+{%- endif %}
   - name: skip-checks
     value: true
   pipelineRef:
@@ -51,13 +55,13 @@ spec:
       - name: url
         value: "https://github.com/red-hat-data-services/devops-runner-images.git"
       - name: revision
-        value: '{{revision}}'
+        value: '{{ "{{revision}}" }}'
       - name: pathInRepo
         value: ".tekton/pipelines/multi-arch-container-build.yaml"
   taskRunTemplate:
-    serviceAccountName: build-pipeline-devops-openshift-utils
+    serviceAccountName: build-pipeline-{{ component_name }}
   workspaces:
   - name: git-auth
     secret:
-      secretName: '{{ git_auth_secret }}'
+      secretName: '{{ "{{ git_auth_secret }}" }}'
 status: {}

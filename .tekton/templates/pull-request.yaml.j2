@@ -2,38 +2,38 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-runner-images?rev={{revision}}
-    build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
-    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-runner-images?rev={{ "{{revision}}" }}
+    build.appstudio.redhat.com/commit_sha: '{{ "{{revision}}" }}'
+    build.appstudio.redhat.com/pull_request_number: '{{ "{{pull_request_number}}" }}'
+    build.appstudio.redhat.com/target_branch: '{{ "{{target_branch}}" }}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "pull_request"
         && target_branch == "main"
         && ( 
-          "./tracer/***".pathChanged()
+          "./{{ path_context }}/***".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
-            || ".tekton/devops-tracer-pull-request.yaml".pathChanged()
+            || ".tekton/{{ component_name }}-pull-request.yaml".pathChanged()
         )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: devops-runner-images
-    appstudio.openshift.io/component: devops-tracer
+    appstudio.openshift.io/component: {{ component_name }}
     pipelines.appstudio.openshift.io/type: build
-  name: devops-tracer-on-pull-request
+  name: {{ component_name }}-on-pull-request
   namespace: rhoai-tenant
 spec:
   params:
   - name: git-url
-    value: '{{source_url}}'
+    value: '{{ "{{source_url}}" }}'
   - name: revision
-    value: '{{revision}}'
+    value: '{{ "{{revision}}" }}'
   - name: output-image
-    value: quay.io/rhoai-devops/tracer:on-pr-{{revision}}
+    value: quay.io/rhoai-devops/{{ image_name }}:on-pr-{{ "{{revision}}" }}
   - name: additional-tags
     value:
-      - on-pr-{{pull_request_number}}
+      - on-pr-{{ "{{pull_request_number}}" }}
   - name: image-expires-after
     value: 5d
   - name: build-platforms
@@ -43,11 +43,13 @@ spec:
   - name: dockerfile
     value: Containerfile
   - name: path-context
-    value: tracer
+    value: {{ path_context }}
   - name: build-args-file
     value: ./argfile.conf
+{%- if additional_secret is defined and additional_secret %}
   - name: additional-secret
-    value: devops-infra-ssh-key-devops-image-builds
+    value: {{ additional_secret }}
+{%- endif %}
   - name: skip-checks
     value: true
   pipelineRef:
@@ -56,13 +58,13 @@ spec:
       - name: url
         value: "https://github.com/red-hat-data-services/devops-runner-images.git"
       - name: revision
-        value: '{{revision}}'
+        value: '{{ "{{revision}}" }}'
       - name: pathInRepo
         value: ".tekton/pipelines/multi-arch-container-build.yaml"
   taskRunTemplate:
-    serviceAccountName: build-pipeline-devops-tracer
+    serviceAccountName: build-pipeline-{{ component_name }}
   workspaces:
   - name: git-auth
     secret:
-      secretName: '{{ git_auth_secret }}'
+      secretName: '{{ "{{ git_auth_secret }}" }}'
 status: {}
