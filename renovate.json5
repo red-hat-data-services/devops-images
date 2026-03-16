@@ -38,7 +38,10 @@
       ],
 
       // Look up versions from a container image registry (Docker Hub, Quay, etc.)
-      "datasourceTemplate": "docker"
+      "datasourceTemplate": "docker",
+
+      // Template for how Renovate should construct the replacement string
+      "autoReplaceStringTemplate": "={{depName}}:{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}"
     }
   ],
 
