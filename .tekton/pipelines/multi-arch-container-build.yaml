@@ -73,7 +73,7 @@ spec:
       VMs
     name: privileged-nested
     type: string
-  - default: ""
+  - default: "does-not-exist"
     description: Name of a cluster secret to securely inject into build
     name: additional-secret
     type: string
