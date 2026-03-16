@@ -8,9 +8,9 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "push" 
-      && target_branch == "main" && 
-      ( "./openshift-utils/***".pathChanged() 
+      event == "push"
+      && target_branch == "main" &&
+      ( "./openshift-utils/***".pathChanged()
         || ".tekton/devops-openshift-utils-push.yaml".pathChanged() )
   creationTimestamp: null
   labels:
@@ -50,7 +50,7 @@ spec:
       - name: revision
         value: '{{revision}}'
       - name: pathInRepo
-        value: ".tekton/pipelines/multi-arch-container-build.yaml" 
+        value: ".tekton/pipelines/multi-arch-container-build.yaml"
   taskRunTemplate:
     serviceAccountName: build-pipeline-devops-openshift-utils
   workspaces:
