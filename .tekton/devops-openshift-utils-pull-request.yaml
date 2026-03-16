@@ -10,9 +10,12 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "pull_request"
-      && target_branch == "main"
-      && ( "./openshift-utils/***".pathChanged()
-      || ".tekton/devops-openshift-utils-pull-request.yaml".pathChanged())
+        && target_branch == "main"
+        && ( 
+          "./openshift-utils/***".pathChanged()
+            || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
+            || ".tekton/devops-openshift-utils-pull-request.yaml".pathChanged()
+        )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: devops-runner-images
