@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-runner-images?rev={{revision}}
+    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-images?rev={{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
@@ -17,7 +17,7 @@ metadata:
         )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: devops-runner-images
+    appstudio.openshift.io/application: devops-images
     appstudio.openshift.io/component: devops-tracer
     pipelines.appstudio.openshift.io/type: build
   name: devops-tracer-on-push
@@ -51,7 +51,7 @@ spec:
     resolver: git
     params:
       - name: url
-        value: "https://github.com/red-hat-data-services/devops-runner-images.git"
+        value: "https://github.com/red-hat-data-services/devops-images.git"
       - name: revision
         value: '{{revision}}'
       - name: pathInRepo
