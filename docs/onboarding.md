@@ -4,6 +4,7 @@
 
 - Access to the `red-hat-data-services` GitHub organization
 - Push access to `quay.io/rhoai-devops`
+- The target image repository must already exist on `quay.io/rhoai-devops` (e.g. `quay.io/rhoai-devops/my-tool`)
 - `uv` installed (for running generation scripts)
 
 ## Steps
@@ -63,7 +64,15 @@ This produces:
 - `.tekton/<name>-push.yaml` — PipelineRun triggered on push to main
 - `.konflux/ProjectDevelopmentStream.yaml` — updated with the new component
 
-### 4. Commit and push
+### 4. Apply the updated ProjectDevelopmentStream
+
+The generated `.konflux/ProjectDevelopmentStream.yaml` must be applied to the cluster so Konflux knows about the new component:
+
+```bash
+oc apply -f .konflux/ProjectDevelopmentStream.yaml -n rhoai-tenant
+```
+
+### 5. Commit and push
 
 Commit the new directory, updated `config.yaml`, and all generated files. Open a PR — the pipeline will trigger automatically for PR validation builds.
 

@@ -17,14 +17,18 @@ You are guiding the user through adding a new container image to this repo. Foll
 
 2. Check that `uv` is available — they'll need it to run the generation scripts.
 
-3. Walk them through each step one at a time:
+3. Confirm the target image repository already exists on `quay.io/rhoai-devops`.
+
+4. Walk them through each step one at a time:
    - Create the directory and write a Containerfile
-   - Add the entry to `components.yaml`
+   - Add the entry to `config.yaml`
    - Run `uv run scripts/generate-pipelines.py` and `uv run scripts/generate-pds.py`
    - Explain what was generated and why
 
-4. Ask if the image needs a build secret (e.g. SSH key for cloning a private repo). If so, explain the `additional_secret` field and that the secret must exist in the namespace.
+5. Ask if the image needs a build secret (e.g. SSH key for cloning a private repo). If so, explain the `additional_secret` field and that the secret must exist in the namespace.
 
-5. After all steps, summarize what they need to commit and what happens when they push.
+6. Remind the user to apply the updated ProjectDevelopmentStream to the cluster: `oc apply -f .konflux/ProjectDevelopmentStream.yaml -n rhoai-tenant`
+
+7. After all steps, summarize what they need to commit and what happens when they push.
 
 Keep it conversational — one step at a time, confirm before moving on.
