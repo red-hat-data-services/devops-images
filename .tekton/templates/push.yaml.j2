@@ -42,7 +42,7 @@ spec:
   - name: path-context
     value: {{ path_context }}
   - name: build-args-file
-    value: ./argfile.conf
+    value: ./{{ path_context }}/argfile.conf
 {%- if additional_secret is defined and additional_secret %}
   - name: additional-secret
     value: {{ additional_secret }}

@@ -26,7 +26,7 @@ FROM $BASE_RUNNER
 RUN dnf install -y <packages>
 ```
 
-The `BASE_RUNNER` arg is pinned in `argfile.conf` with a SHA256 digest for reproducible builds.
+The `BASE_RUNNER` arg is pinned in `builds/my-tool/argfile.conf` with a SHA256 digest for reproducible builds. Each image has its own `argfile.conf`.
 
 ### 2. Add to config.yaml
 
@@ -72,5 +72,5 @@ Once merged to main, the push pipeline builds and tags the image with the commit
 ## Updating an existing image
 
 1. Edit the `Containerfile` in the component's directory.
-2. If the base image changes, update `argfile.conf` with the new digest (or let Renovate handle it).
+2. If the base image changes, update the image's `argfile.conf` with the new digest (or let Renovate handle it).
 3. Push to `main` — the pipeline triggers automatically for changed directories only.
