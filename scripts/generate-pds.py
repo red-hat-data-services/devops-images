@@ -13,7 +13,7 @@ from jinja2 import Environment, FileSystemLoader
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(REPO_ROOT, "templates")
 KONFLUX_DIR = os.path.join(REPO_ROOT, ".konflux")
-CONFIG_FILE = os.path.join(REPO_ROOT, "components.yaml")
+CONFIG_FILE = os.path.join(REPO_ROOT, "config.yaml")
 
 
 def main():

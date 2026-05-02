@@ -13,7 +13,7 @@ from jinja2 import Environment, FileSystemLoader
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEKTON_DIR = os.path.join(REPO_ROOT, ".tekton")
 TEKTON_TEMPLATES_DIR = os.path.join(TEKTON_DIR, "templates")
-CONFIG_FILE = os.path.join(REPO_ROOT, "components.yaml")
+CONFIG_FILE = os.path.join(REPO_ROOT, "config.yaml")
 
 TEMPLATES = [
     ("pull-request.yaml.j2", "pull-request"),
