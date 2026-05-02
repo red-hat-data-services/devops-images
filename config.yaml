@@ -1,0 +1,18 @@
+git_url: https://github.com/red-hat-data-services/devops-images
+image_prefix: quay.io/rhoai-devops
+branch: main
+application_name: devops-images
+namespace: rhoai-tenant
+pipeline: docker-build-multi-platform-oci-ta
+
+components:
+  - name: devops-base-runner
+    image_name: base-runner
+    context: builds/base
+  - name: devops-openshift-utils
+    image_name: openshift-utils
+    context: builds/openshift-utils
+  - name: devops-tracer
+    image_name: tracer
+    context: builds/tracer
+    additional_secret: devops-infra-ssh-key-devops-image-builds
