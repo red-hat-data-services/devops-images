@@ -42,7 +42,7 @@ spec:
   - name: path-context
     value: builds/base
   - name: build-args-file
-    value: ./argfile.conf
+    value: ./builds/base/argfile.conf
   - name: skip-checks
     value: true
   pipelineRef:

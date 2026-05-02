@@ -45,7 +45,7 @@ spec:
   - name: path-context
     value: builds/tracer
   - name: build-args-file
-    value: ./argfile.conf
+    value: ./builds/tracer/argfile.conf
   - name: additional-secret
     value: devops-infra-ssh-key-devops-image-builds
   - name: skip-checks

@@ -32,9 +32,9 @@ uv run scripts/generate-pds.py
 
 Dependencies (`jinja2`, `pyyaml`) are declared inline via PEP 723 — `uv` handles them automatically.
 
-### argfile.conf
+### argfile.conf (per-image)
 
-Build arguments with pinned SHA256 digests for reproducible builds. Renovate automatically creates PRs when upstream images change.
+Each image directory under `builds/` has its own `argfile.conf` with pinned SHA256 digests for reproducible builds. Renovate automatically creates PRs when upstream images change.
 
 ### CI/CD
 
