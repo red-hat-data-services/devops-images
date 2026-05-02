@@ -1,0 +1,21 @@
+ARG BASE_RUNNER=quay.io/rhoai-devops/base-runner:latest
+ARG BASE_OPENSHIFT_UTILS=quay.io/rhoai-devops/openshift-utils:latest
+
+FROM $BASE_RUNNER AS git-clone
+
+ARG SECRET_NAME=devops-infra-ssh-key-devops-image-builds
+WORKDIR /app
+RUN --mount=type=secret,id=${SECRET_NAME}/ssh-privatekey \
+    --mount=type=secret,id=${SECRET_NAME}/known_hosts \
+    GIT_SSH_COMMAND="ssh -i /run/secrets/${SECRET_NAME}/ssh-privatekey -o UserKnownHostsFile=/run/secrets/${SECRET_NAME}/known_hosts" \
+    git clone git@github.com:red-hat-data-services/rhods-devops-infra.git
+
+FROM $BASE_OPENSHIFT_UTILS
+
+COPY --from=git-clone /app/rhods-devops-infra/tools/tracer/tracer.sh /usr/local/bin/tracer.sh
+COPY --from=git-clone /app/rhods-devops-infra/tools/send-slack-message/send-slack-message.sh /usr/local/bin/send-slack-message.sh
+COPY --from=git-clone /app/rhods-devops-infra/tools/send-slack-message/tracer-diff.sh /usr/local/bin/tracer-diff.sh
+
+RUN chmod +x /usr/local/bin/tracer.sh /usr/local/bin/send-slack-message.sh /usr/local/bin/tracer-diff.sh
+
+ENV TRACER=/usr/local/bin/tracer.sh
