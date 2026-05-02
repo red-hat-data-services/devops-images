@@ -1,0 +1,65 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-images?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push"
+        && target_branch == "main"
+        && ( 
+          "./builds/slack-notifier/***".pathChanged()
+            || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
+            || ".tekton/devops-slack-notifier-push.yaml".pathChanged()
+        )
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: devops-images
+    appstudio.openshift.io/component: devops-slack-notifier
+    pipelines.appstudio.openshift.io/type: build
+  name: devops-slack-notifier-on-push
+  namespace: rhoai-tenant
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: output-image
+    value: quay.io/rhoai-devops/slack-notifier:{{revision}}
+  - name: additional-tags
+    value:
+      - latest
+  - name: build-platforms
+    value:
+    - linux/x86_64
+    - linux/arm64
+  - name: dockerfile
+    value: Containerfile
+  - name: path-context
+    value: builds/slack-notifier
+  - name: build-args-file
+    value: ./builds/slack-notifier/argfile.conf
+  - name: additional-secret
+    value: devops-infra-ssh-key-devops-image-builds
+  - name: skip-checks
+    value: true
+  pipelineRef:
+    resolver: git
+    params:
+      - name: url
+        value: "https://github.com/red-hat-data-services/devops-images.git"
+      - name: revision
+        value: '{{revision}}'
+      - name: pathInRepo
+        value: ".tekton/pipelines/multi-arch-container-build.yaml"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-devops-slack-notifier
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+status: {}

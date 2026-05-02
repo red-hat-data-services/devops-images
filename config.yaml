@@ -16,3 +16,7 @@ components:
     image_name: tracer
     context: builds/tracer
     additional_secret: devops-infra-ssh-key-devops-image-builds
+  - name: devops-slack-notifier
+    image_name: slack-notifier
+    context: builds/slack-notifier
+    additional_secret: devops-infra-ssh-key-devops-image-builds
