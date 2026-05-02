@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-images?rev={{ "{{revision}}" }}
+    build.appstudio.openshift.io/repo: {{ git_url }}?rev={{ "{{revision}}" }}
     build.appstudio.redhat.com/commit_sha: '{{ "{{revision}}" }}'
     build.appstudio.redhat.com/target_branch: '{{ "{{target_branch}}" }}'
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
@@ -29,7 +29,7 @@ spec:
   - name: revision
     value: '{{ "{{revision}}" }}'
   - name: output-image
-    value: quay.io/rhoai-devops/{{ image_name }}:{{ "{{revision}}" }}
+    value: {{ image_prefix }}/{{ image_name }}:{{ "{{revision}}" }}
   - name: additional-tags
     value:
       - latest
@@ -53,7 +53,7 @@ spec:
     resolver: git
     params:
       - name: url
-        value: "https://github.com/red-hat-data-services/devops-images.git"
+        value: "{{ git_url }}.git"
       - name: revision
         value: '{{ "{{revision}}" }}'
       - name: pathInRepo

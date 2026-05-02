@@ -1,0 +1,44 @@
+---
+apiVersion: projctl.konflux.dev/v1beta1
+kind: ProjectDevelopmentStream
+metadata:
+  name: {{ application_name }}-stream-{{ branch }}
+spec:
+  project: {{ namespace }}
+  template:
+    name: {{ application_name }}-template
+
+---
+apiVersion: projctl.konflux.dev/v1beta1
+kind: ProjectDevelopmentStreamTemplate
+metadata:
+  name: {{ application_name }}-template
+spec:
+  project: {{ namespace }}
+  variables: []
+  resources:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      kind: Application
+      metadata:
+        name: {{ application_name }}
+      spec:
+        displayName: {{ application_name }}
+{%- for comp in components %}
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      kind: Component
+      metadata:
+        annotations:
+          build.appstudio.openshift.io/pipeline: '{"name":"{{ pipeline }}","bundle":"latest"}'
+          build.appstudio.openshift.io/request: configure-pac-no-mr
+        name: {{ comp.name }}
+      spec:
+        application: {{ application_name }}
+        componentName: {{ comp.name }}
+        containerImage: {{ image_prefix }}/{{ comp.image_name }}
+        source:
+          git:
+            context: ./{{ comp.context }}
+            dockerfileUrl: Containerfile
+            revision: {{ branch }}
+            url: {{ git_url }}
+{%- endfor %}
