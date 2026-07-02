@@ -11,7 +11,7 @@ metadata:
       event == "push"
         && target_branch == "main"
         && ( 
-          "./builds/slack-notifier/***".pathChanged()
+          "./builds/slack-notifier/**".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
             || ".tekton/devops-slack-notifier-push.yaml".pathChanged()
         )

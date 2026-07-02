@@ -11,7 +11,7 @@ metadata:
       event == "push"
         && target_branch == "main"
         && ( 
-          "./builds/openshift-utils/***".pathChanged()
+          "./builds/openshift-utils/**".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
             || ".tekton/devops-openshift-utils-push.yaml".pathChanged()
         )
