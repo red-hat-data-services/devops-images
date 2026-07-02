@@ -20,3 +20,6 @@ components:
     image_name: slack-notifier
     context: builds/slack-notifier
     additional_secret: devops-infra-ssh-key-devops-image-builds
+  - name: devops-embargo-ci-runner
+    image_name: embargo-ci-runner
+    context: builds/embargo-ci-runner
