@@ -4,6 +4,7 @@ FROM $BASE_RUNNER
 ARG TARGETARCH
 
 RUN dnf install -y python3.12 python3.12-pip openssh-clients ca-certificates && dnf clean all
+RUN alternatives --set python3 /usr/bin/python3.12
 
 RUN pip3.12 install uv
 
