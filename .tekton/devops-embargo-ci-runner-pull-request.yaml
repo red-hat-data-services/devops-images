@@ -1,0 +1,66 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/devops-images?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "pull_request"
+        && target_branch == "main"
+        && ( 
+          "./builds/embargo-ci-runner/***".pathChanged()
+            || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
+            || ".tekton/devops-embargo-ci-runner-pull-request.yaml".pathChanged()
+        )
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: devops-images
+    appstudio.openshift.io/component: devops-embargo-ci-runner
+    pipelines.appstudio.openshift.io/type: build
+  name: devops-embargo-ci-runner-on-pull-request
+  namespace: rhoai-tenant
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: output-image
+    value: quay.io/rhoai-devops/embargo-ci-runner:on-pr-{{revision}}
+  - name: additional-tags
+    value:
+      - on-pr-{{pull_request_number}}
+  - name: image-expires-after
+    value: 5d
+  - name: build-platforms
+    value:
+    - linux/x86_64
+    - linux/arm64
+  - name: dockerfile
+    value: Containerfile
+  - name: path-context
+    value: builds/embargo-ci-runner
+  - name: build-args-file
+    value: ./builds/embargo-ci-runner/argfile.conf
+  - name: skip-checks
+    value: true
+  pipelineRef:
+    resolver: git
+    params:
+      - name: url
+        value: "https://github.com/red-hat-data-services/devops-images.git"
+      - name: revision
+        value: '{{revision}}'
+      - name: pathInRepo
+        value: ".tekton/pipelines/multi-arch-container-build.yaml"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-devops-embargo-ci-runner
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+status: {}

@@ -66,7 +66,7 @@ This produces:
 
 ### 4. Apply the updated ProjectDevelopmentStream
 
-The generated `.konflux/ProjectDevelopmentStream.yaml` must be applied to the cluster so Konflux knows about the new component:
+The generated `.konflux/ProjectDevelopmentStream.yaml` must be applied to the cluster **before** opening the PR. The PDS sets up the correct service account for the new component's pipeline — without it, the PR build will fail due to missing permissions.
 
 ```bash
 oc apply -f .konflux/ProjectDevelopmentStream.yaml -n rhoai-tenant

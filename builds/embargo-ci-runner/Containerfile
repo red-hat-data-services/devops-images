@@ -1,0 +1,18 @@
+ARG BASE_RUNNER=quay.io/rhoai-devops/base-runner:latest
+FROM $BASE_RUNNER
+
+ARG TARGETARCH
+
+RUN dnf install -y python3.12 python3.12-pip openssh-clients ca-certificates && dnf clean all
+
+RUN pip3.12 install uv
+
+RUN curl -sL "https://gitlab.com/gitlab-org/cli/-/releases/v1.80.4/downloads/glab_1.80.4_linux_${TARGETARCH}.tar.gz" \
+    | tar xz -C /usr/local/bin --strip-components=1 bin/glab
+
+RUN curl -sL "https://github.com/cli/cli/releases/download/v2.65.0/gh_2.65.0_linux_${TARGETARCH}.tar.gz" \
+    | tar xz -C /usr/local/bin --strip-components=2 "gh_2.65.0_linux_${TARGETARCH}/bin/gh"
+
+RUN curl -so /etc/pki/ca-trust/source/anchors/redhat-it-root.crt \
+    https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem \
+    && update-ca-trust
