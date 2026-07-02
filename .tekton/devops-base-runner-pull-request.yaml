@@ -12,7 +12,7 @@ metadata:
       event == "pull_request"
         && target_branch == "main"
         && ( 
-          "./builds/base/***".pathChanged()
+          "./builds/base/**".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
             || ".tekton/devops-base-runner-pull-request.yaml".pathChanged()
         )

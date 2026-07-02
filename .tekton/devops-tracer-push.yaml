@@ -11,7 +11,7 @@ metadata:
       event == "push"
         && target_branch == "main"
         && ( 
-          "./builds/tracer/***".pathChanged()
+          "./builds/tracer/**".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
             || ".tekton/devops-tracer-push.yaml".pathChanged()
         )

@@ -12,7 +12,7 @@ metadata:
       event == "pull_request"
         && target_branch == "main"
         && ( 
-          "./builds/slack-notifier/***".pathChanged()
+          "./builds/slack-notifier/**".pathChanged()
             || ".tekton/pipelines/multi-arch-container-build.yaml".pathChanged()
             || ".tekton/devops-slack-notifier-pull-request.yaml".pathChanged()
         )
