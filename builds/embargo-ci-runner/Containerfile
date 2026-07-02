@@ -16,3 +16,6 @@ RUN curl -sL "https://github.com/cli/cli/releases/download/v2.65.0/gh_2.65.0_lin
 RUN curl -so /etc/pki/ca-trust/source/anchors/redhat-it-root.crt \
     https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem \
     && update-ca-trust
+
+RUN mkdir -p /home/runner && chmod 777 /home/runner
+ENV HOME=/home/runner
