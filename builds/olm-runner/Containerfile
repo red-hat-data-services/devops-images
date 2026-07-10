@@ -1,0 +1,7 @@
+ARG BASE_RUNNER=quay.io/rhoai-devops/openshift-utils:latest
+FROM $BASE_RUNNER
+ARG TARGETARCH=arm64
+WORKDIR /app
+
+RUN dnf install -y python3 python3-pip findutils
+RUN pip install uv
