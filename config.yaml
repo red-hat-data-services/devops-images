@@ -23,3 +23,6 @@ components:
   - name: devops-embargo-ci-runner
     image_name: embargo-ci-runner
     context: builds/embargo-ci-runner
+  - name: devops-olm-runner
+    image_name: olm-runner
+    context: builds/olm-runner
