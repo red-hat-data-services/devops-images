@@ -9,3 +9,7 @@ RUN curl -fsSL https://mirror.openshift.com/pub/openshift-v4/${TARGETARCH}/clien
 RUN mv opm-rhel9 opm
 
 RUN chmod +x oc opm kubectl && mv oc opm kubectl /usr/local/bin/ && rm /app/*
+
+RUN curl -o cosign -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-${TARGETARCH}" && \
+  mv cosign /usr/local/bin/cosign && \
+  chmod +x /usr/local/bin/cosign
