@@ -19,5 +19,9 @@ RUN curl -so /etc/pki/ca-trust/source/anchors/redhat-it-root.crt \
     https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem \
     && update-ca-trust
 
+RUN curl -o cosign -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-${TARGETARCH}" && \
+  mv cosign /usr/local/bin/cosign && \
+  chmod +x /usr/local/bin/cosign
+
 RUN mkdir -p /home/runner && chmod 777 /home/runner
 ENV HOME=/home/runner
