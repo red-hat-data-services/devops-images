@@ -1,0 +1,56 @@
+ARG PYTHON_IMAGE=docker.io/library/python:3.13-slim-trixie
+FROM $PYTHON_IMAGE
+
+# Keep cosign compatible with the monitoring bundle-attestation check.
+ARG OC_VERSION=4.22.18
+ARG COSIGN_VERSION=2.4.1
+ARG YQ_VERSION=3.4.3
+
+# Includes tools used indirectly by Python subprocesses (notably `which`),
+# SSH-based data updates, and externally cloned config-validator scripts.
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        bash ca-certificates coreutils curl diffutils findutils gh git grep \
+        gzip jq openssh-client sed tar which \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download versioned clients and verify their published SHA-256 checksums.
+# Match the container architecture rather than the build host architecture.
+RUN set -eux; \
+    arch="$(dpkg --print-architecture)"; \
+    case "$arch" in \
+        amd64) oc_archive=openshift-client-linux.tar.gz ;; \
+        arm64) oc_archive=openshift-client-linux-arm64.tar.gz ;; \
+        *) echo "Unsupported client architecture: $arch" >&2; exit 1 ;; \
+    esac; \
+    mkdir -p /tmp/clients; \
+    cd /tmp/clients; \
+    oc_url="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_VERSION}"; \
+    curl --fail --show-error --location --retry 3 "$oc_url/$oc_archive" -o "$oc_archive"; \
+    curl --fail --show-error --location --retry 3 "$oc_url/sha256sum.txt" -o oc-checksums.txt; \
+    awk -v file="$oc_archive" '$2 == file {print}' oc-checksums.txt > oc-checksum.txt; \
+    test -s oc-checksum.txt; \
+    sha256sum --check oc-checksum.txt; \
+    tar -xzf "$oc_archive" -C /usr/local/bin oc kubectl; \
+    cosign_url="https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}"; \
+    curl --fail --show-error --location --retry 3 "$cosign_url/cosign-linux-$arch" -o "cosign-linux-$arch"; \
+    curl --fail --show-error --location --retry 3 "$cosign_url/cosign_checksums.txt" -o cosign-checksums.txt; \
+    awk -v file="cosign-linux-$arch" '$2 == file {print}' cosign-checksums.txt > cosign-checksum.txt; \
+    test -s cosign-checksum.txt; \
+    sha256sum --check cosign-checksum.txt; \
+    install -m 0755 "cosign-linux-$arch" /usr/local/bin/cosign; \
+    cd /; \
+    rm -rf /tmp/clients
+
+# This is the jq-wrapper yq used by CI, NOT mikefarah/yq (different syntax).
+# Job-specific Python libraries remain runtime dependencies in the job venv.
+RUN python -m pip install --no-cache-dir "yq==${YQ_VERSION}"
+
+# Fail the build if a downloaded CLI cannot run on the base image.
+RUN python --version && python -m pip --version \
+    && git --version && gh --version && curl --version && ssh -V \
+    && jq --version && yq --version && which oc \
+    && oc version --client && kubectl version --client && cosign version
+
+# No entrypoint: GitLab Runner must be able to supply its own shell command.
+CMD ["/bin/bash"]
