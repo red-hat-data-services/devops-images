@@ -26,3 +26,6 @@ components:
   - name: devops-olm-runner
     image_name: olm-runner
     context: builds/olm-runner
+  - name: devops-rhoai-monitoring-ci
+    image_name: rhoai-monitoring-ci
+    context: builds/rhoai-monitoring-ci
